@@ -1,0 +1,27 @@
+#!/usr/bin/ruby
+
+# development vendor
+vendorlib = File.expand_path(File.join(File.dirname(File.realpath(__FILE__)), "..", "bundle", "bundler", "setup.rb"))
+hardvendor = "/var/lib/coding_question_mixpanel/bundle/bundler/setup.rb"
+
+if File.exists?(vendorlib)
+  puts "using vendorlib: #{vendorlib}"
+  require vendorlib
+elsif File.exists?(hardvendor)
+  puts "using packaged vendorlib: #{hardvendor}"
+  require hardvendor
+else
+  puts "FATAL: you must run bundle install --standalone; or could not find the vendor directory #{vendorlib}"
+  exit 1
+end
+
+require 'trollop'
+require 'coding_question_mixpanel'
+
+options = Trollop::options do
+  opt :database, "MySQL database connection string.  Example: 'mysql://db_user:secret_password@db.example.com/app'", :type => :string, :required => true
+  opt :logfile, "Logfile contining .csv data for shipping to the database", :type => :string, :required => true
+end 
+
+CodingQuestionMixpanel.setup_orm(options)
+CodingQuestionMixpanel.log_ship(options)
