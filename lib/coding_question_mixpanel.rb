@@ -21,7 +21,11 @@ class CodingQuestionMixpanel
         update_this_user = User.first(:email => row[1])
         update_this_user = User.create(:email => row[1]) unless update_this_user
         update_this_user.bounce_count += 1 if row[0] == "B"
-        update_this_user.last_bounce = row[2]
+        if update_this_user.last_bounce
+          update_this_user.last_bounce = row[2] unless DateTime.parse(row[2]) < update_this_user.last_bounce 
+        else
+          update_this_user.last_bounce = row[2]
+        end
         update_this_user.save
       end
     end
